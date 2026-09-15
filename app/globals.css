@@ -1,0 +1,113 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: 'Geist', 'Geist Fallback', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Geist Mono', 'Geist Mono Fallback', ui-monospace, monospace;
+
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+
+  /* Data-encoding tokens — the paper-sheet color legend */
+  --color-recue: var(--cell-recue);
+  --color-recue-foreground: var(--cell-recue-fg);
+  --color-manquante: var(--cell-manquante);
+  --color-manquante-foreground: var(--cell-manquante-fg);
+  --color-anomalie: var(--cell-anomalie);
+  --color-anomalie-foreground: var(--cell-anomalie-fg);
+  --color-excusee: var(--cell-excusee);
+  --color-excusee-foreground: var(--cell-excusee-fg);
+  --color-weekend: var(--cell-weekend);
+  --color-weekend-foreground: var(--cell-weekend-fg);
+  --color-ferme: var(--cell-ferme);
+  --color-ferme-foreground: var(--cell-ferme-fg);
+  --color-atm: var(--cell-atm);
+  --color-atm-foreground: var(--cell-atm-fg);
+  --color-ferie: var(--cell-ferie);
+  --color-ferie-foreground: var(--cell-ferie-fg);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+}
+
+:root {
+  color-scheme: light;
+
+  --background: oklch(0.984 0.003 260);
+  --foreground: oklch(0.24 0.02 264);
+
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.24 0.02 264);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.24 0.02 264);
+
+  --primary: oklch(0.5 0.17 258);
+  --primary-foreground: oklch(0.99 0.002 260);
+
+  --secondary: oklch(0.965 0.005 260);
+  --secondary-foreground: oklch(0.3 0.02 264);
+
+  --muted: oklch(0.965 0.005 260);
+  --muted-foreground: oklch(0.52 0.02 262);
+
+  --accent: oklch(0.955 0.012 258);
+  --accent-foreground: oklch(0.3 0.03 262);
+
+  --destructive: oklch(0.55 0.21 25);
+  --destructive-foreground: oklch(0.99 0.002 260);
+
+  --border: oklch(0.905 0.008 262);
+  --input: oklch(0.905 0.008 262);
+  --ring: oklch(0.5 0.17 258);
+
+  --radius: 0.5rem;
+
+  /* Paper-sheet legend — status of a monitoring cell */
+  --cell-recue: oklch(0.93 0.05 250);
+  --cell-recue-fg: oklch(0.4 0.15 258);
+  --cell-manquante: oklch(0.92 0.07 25);
+  --cell-manquante-fg: oklch(0.48 0.19 27);
+  --cell-anomalie: oklch(0.93 0.09 85);
+  --cell-anomalie-fg: oklch(0.46 0.11 70);
+  --cell-excusee: oklch(0.95 0.004 260);
+  --cell-excusee-fg: oklch(0.5 0.02 262);
+  --cell-weekend: oklch(0.93 0.004 260);
+  --cell-weekend-fg: oklch(0.6 0.015 262);
+  --cell-ferme: oklch(0.92 0.05 195);
+  --cell-ferme-fg: oklch(0.42 0.07 210);
+  --cell-atm: oklch(0.93 0.08 62);
+  --cell-atm-fg: oklch(0.48 0.12 55);
+  --cell-ferie: oklch(0.93 0.06 350);
+  --cell-ferie-fg: oklch(0.47 0.14 355);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
