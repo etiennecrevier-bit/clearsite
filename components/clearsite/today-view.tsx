@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import {
   AlertTriangle,
   ArrowUpRight,
@@ -9,14 +10,19 @@ import {
   Clock,
   MessageSquare,
   Send,
+  X,
 } from 'lucide-react'
 import {
   ANOMALY_LABELS,
+  CLIENT_ORDER,
+  CLIENT_SHORT,
+  EMPLOYEES,
   STATUS_META,
   TODAY,
   todayReminders,
   todayRows,
   type CellStatus,
+  type Site,
 } from '@/lib/clearsite-data'
 import { StatusBadge } from './status-badge'
 
@@ -34,6 +40,10 @@ export function TodayView({
   const rows = todayRows()
   const reminders = todayReminders()
 
+  const [statusFilter, setStatusFilter] = useState<CellStatus | 'total'>('total')
+  const [clientFilter, setClientFilter] = useState<Site['client'] | 'all'>('all')
+  const [employeeFilter, setEmployeeFilter] = useState<string>('all')
+
   const count = (s: CellStatus) => rows.filter((r) => r.cell.status === s).length
   const attendues = rows.length
   const recues = count('recue')
@@ -48,6 +58,24 @@ export function TodayView({
     { key: 'manquante', label: 'Manquantes', value: manquantes, hint: 'Passé l\u2019heure limite' },
     { key: 'attendue', label: 'En attente', value: enAttente, hint: 'Avant l\u2019heure limite' },
   ]
+
+  // N'afficher que les compagnies / employés réellement cédulés aujourd'hui.
+  const activeClients = CLIENT_ORDER.filter((c) => rows.some((r) => r.site.client === c))
+  const activeEmployees = EMPLOYEES.filter((e) => rows.some((r) => r.employee.id === e.id))
+
+  const filteredRows = rows.filter((r) => {
+    if (statusFilter !== 'total' && r.cell.status !== statusFilter) return false
+    if (clientFilter !== 'all' && r.site.client !== clientFilter) return false
+    if (employeeFilter !== 'all' && r.employee.id !== employeeFilter) return false
+    return true
+  })
+
+  const filtersActive = statusFilter !== 'total' || clientFilter !== 'all' || employeeFilter !== 'all'
+  const resetFilters = () => {
+    setStatusFilter('total')
+    setClientFilter('all')
+    setEmployeeFilter('all')
+  }
 
   return (
     <div className="space-y-6">
@@ -67,21 +95,74 @@ export function TodayView({
         </button>
       </div>
 
-      {/* Cartes de synthèse */}
+      {/* Cartes de synthèse — cliquables pour filtrer par statut */}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
         {stats.map((s) => {
           const meta = s.key === 'total' ? null : STATUS_META[s.key as CellStatus]
+          const active = statusFilter === s.key
           return (
-            <div key={s.key} className="rounded-lg border bg-card p-4">
+            <button
+              key={s.key}
+              type="button"
+              aria-pressed={active}
+              onClick={() => setStatusFilter(s.key)}
+              className={`rounded-lg border p-4 text-left transition-colors ${
+                active ? 'border-primary bg-accent ring-1 ring-primary' : 'bg-card hover:bg-accent'
+              }`}
+            >
               <div className="flex items-center gap-2">
                 {meta && <span className="size-2.5 rounded-full" style={{ backgroundColor: meta.fg }} aria-hidden />}
                 <span className="text-xs font-medium text-muted-foreground">{s.label}</span>
               </div>
               <div className="mt-2 font-mono text-3xl font-semibold tabular-nums">{s.value}</div>
               <div className="mt-0.5 text-xs text-muted-foreground">{s.hint}</div>
-            </div>
+            </button>
           )
         })}
+      </div>
+
+      {/* Filtres par compagnie / employé */}
+      <div className="flex flex-wrap items-center gap-3 rounded-lg border bg-card px-4 py-3">
+        <span className="text-xs font-medium text-muted-foreground">Filtrer :</span>
+        <label className="flex items-center gap-2 text-sm">
+          <span className="text-muted-foreground">Compagnie</span>
+          <select
+            value={clientFilter}
+            onChange={(e) => setClientFilter(e.target.value as Site['client'] | 'all')}
+            className="rounded-md border bg-background px-2 py-1.5 text-sm"
+          >
+            <option value="all">Toutes</option>
+            {activeClients.map((c) => (
+              <option key={c} value={c}>
+                {CLIENT_SHORT[c]}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="flex items-center gap-2 text-sm">
+          <span className="text-muted-foreground">Employé</span>
+          <select
+            value={employeeFilter}
+            onChange={(e) => setEmployeeFilter(e.target.value)}
+            className="rounded-md border bg-background px-2 py-1.5 text-sm"
+          >
+            <option value="all">Tous</option>
+            {activeEmployees.map((e) => (
+              <option key={e.id} value={e.id}>
+                {e.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        {filtersActive && (
+          <button
+            type="button"
+            onClick={resetFilters}
+            className="inline-flex items-center gap-1 rounded-md px-2 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+          >
+            <X className="size-3.5" /> Réinitialiser
+          </button>
+        )}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
@@ -89,10 +170,17 @@ export function TodayView({
         <section className="rounded-lg border bg-card">
           <div className="flex items-center justify-between border-b px-4 py-3">
             <h3 className="text-sm font-semibold">Bâtiments cédulés — {TODAY}</h3>
-            <span className="text-xs text-muted-foreground">{rows.length} lignes</span>
+            <span className="text-xs text-muted-foreground">
+              {filtersActive ? `${filteredRows.length} / ${rows.length}` : rows.length} lignes
+            </span>
           </div>
           <ul className="divide-y">
-            {rows
+            {filteredRows.length === 0 && (
+              <li className="px-4 py-8 text-center text-sm text-muted-foreground">
+                Aucun bâtiment ne correspond à ces filtres.
+              </li>
+            )}
+            {filteredRows
               .slice()
               .sort((a, b) => order(a.cell.status) - order(b.cell.status))
               .map((r) => {
