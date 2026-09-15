@@ -51,7 +51,7 @@ export type Employee = {
 
 export type Site = {
   id: string
-  client: 'BMO' | 'TD CANADA' | 'BANQUE LAURENTIENNE'
+  client: 'BMO' | 'TD CANADA' | 'RBC ROYALE' | 'BANQUE LAURENTIENNE'
   name: string
   address: string
   city: string
@@ -111,9 +111,28 @@ export const EMPLOYEES: Employee[] = [
   { id: 'e-diab', name: 'Diab Haddad', phone: '+1 514 555 0176', lang: 'fr' },
   { id: 'e-luis', name: 'Luis Ortega', phone: '+1 438 555 0155', lang: 'es' },
   { id: 'e-nadia', name: 'Nadia Belanger', phone: '+1 514 555 0133', lang: 'fr' },
+  { id: 'e-amelie', name: 'Amélie Roy', phone: '+1 514 555 0201', lang: 'fr' },
+  { id: 'e-jonathan', name: 'Jonathan Fortin', phone: '+1 438 555 0212', lang: 'fr' },
+  { id: 'e-patricia', name: 'Patricia Nowak', phone: '+1 514 555 0223', lang: 'en' },
+  { id: 'e-carlos', name: 'Carlos Mendoza', phone: '+1 438 555 0234', lang: 'es' },
+  { id: 'e-fatima', name: 'Fatima Cherif', phone: '+1 514 555 0245', lang: 'fr' },
+  { id: 'e-kevin', name: 'Kevin O\u2019Brien', phone: '+1 514 555 0256', lang: 'en' },
+  { id: 'e-sophie', name: 'Sophie Gagnon', phone: '+1 450 555 0267', lang: 'fr' },
+  { id: 'e-rafael', name: 'Rafael Costa', phone: '+1 438 555 0278', lang: 'es' },
+  { id: 'e-marie', name: 'Marie-Ève Dubé', phone: '+1 514 555 0289', lang: 'fr' },
+  { id: 'e-david', name: 'David Thompson', phone: '+1 514 555 0290', lang: 'en' },
+  { id: 'e-ines', name: 'Inés Vargas', phone: '+1 438 555 0301', lang: 'es' },
+  { id: 'e-hugo', name: 'Hugo Lefebvre', phone: '+1 450 555 0312', lang: 'fr' },
+  { id: 'e-yasmine', name: 'Yasmine Benali', phone: '+1 514 555 0323', lang: 'fr' },
+  { id: 'e-oleg', name: 'Oleg Petrov', phone: '+1 514 555 0334', lang: 'fr' },
+  { id: 'e-priya', name: 'Priya Sharma', phone: '+1 438 555 0345', lang: 'en' },
+  { id: 'e-manon', name: 'Manon Girard', phone: '+1 450 555 0356', lang: 'fr' },
+  { id: 'e-thomas', name: 'Thomas Bergeron', phone: '+1 514 555 0367', lang: 'fr' },
+  { id: 'e-elena', name: 'Elena Ruiz', phone: '+1 438 555 0378', lang: 'es' },
+  { id: 'e-gabriel', name: 'Gabriel Caron', phone: '+1 514 555 0389', lang: 'fr' },
 ]
 
-export const SITES: Site[] = [
+const SEED_SITES: Site[] = [
   { id: 's-1', client: 'TD CANADA', name: 'Montée Gagnon', address: '3461 Montée Gagnon, Terrebonne', city: 'Terrebonne', clearsiteCode: 'TDA1506', transit: '4207', regime: 'ferme_fin_de_semaine', heureLimite: '06:30', employeeId: 'e-charles' },
   { id: 's-2', client: 'TD CANADA', name: 'Cavendish Mall', address: '5800 boul. Cavendish, Montréal', city: 'Montréal', clearsiteCode: 'TDA0718', transit: '3461', regime: '5j_atm', heureLimite: '06:30', employeeId: 'e-charles' },
   { id: 's-3', client: 'BMO', name: 'Place Ville-Marie', address: '1 Place Ville-Marie, Montréal', city: 'Montréal', clearsiteCode: 'BMO2214', transit: '0812', regime: '6j', heureLimite: '07:00', employeeId: 'e-marco' },
@@ -128,11 +147,100 @@ export const SITES: Site[] = [
   { id: 's-12', client: 'TD CANADA', name: 'Repentigny', address: '635 rue Notre-Dame, Repentigny', city: 'Repentigny', clearsiteCode: 'TDA0655', transit: '4055', regime: 'ferme_fin_de_semaine', heureLimite: '06:30', employeeId: 'e-nadia' },
 ]
 
+// ── Générateur de parc (100 bâtiments, 4 réseaux, 25 employés) ──────────────
+// Les 12 bâtiments ci-dessus proviennent des captures réelles ; les suivants
+// sont générés de façon déterministe pour simuler un parc à grande échelle.
+
+export const CLIENT_ORDER: Site['client'][] = ['BMO', 'TD CANADA', 'RBC ROYALE', 'BANQUE LAURENTIENNE']
+
+export const CLIENT_SHORT: Record<Site['client'], string> = {
+  BMO: 'BMO',
+  'TD CANADA': 'TD',
+  'RBC ROYALE': 'RBC',
+  'BANQUE LAURENTIENNE': 'Laurentienne',
+}
+
+const CODE_PREFIX: Record<Site['client'], string> = {
+  BMO: 'BMO',
+  'TD CANADA': 'TDA',
+  'RBC ROYALE': 'RBC',
+  'BANQUE LAURENTIENNE': 'BLC',
+}
+
+const LIMITE_BY_CLIENT: Record<Site['client'], string> = {
+  BMO: '07:00',
+  'TD CANADA': '06:30',
+  'RBC ROYALE': '06:00',
+  'BANQUE LAURENTIENNE': '23:30',
+}
+
+const GEN_CITIES = [
+  'Montréal', 'Laval', 'Longueuil', 'Brossard', 'Terrebonne', 'Repentigny', 'Blainville',
+  'Boucherville', 'Saint-Bruno', 'Mascouche', 'Mirabel', 'Vaudreuil', 'Pointe-Claire',
+  'Kirkland', 'Saint-Léonard', 'Anjou', 'Verdun', 'Lachine', 'LaSalle', 'Rosemère',
+  'Sainte-Thérèse', 'Candiac', 'Chambly', 'Granby', 'Saint-Hyacinthe', 'Sorel', 'Joliette',
+  'Saint-Jérôme', 'Gatineau', 'Sherbrooke', 'Trois-Rivières', 'Drummondville', 'Lévis',
+  'Beloeil', 'Varennes', 'Delson',
+]
+
+const GEN_SUFFIX = [
+  'Centre', 'Carrefour', 'Place', 'Galeries', 'Quartier', 'Promenades', 'Faubourg',
+  'Plaza', 'Marché', 'Village', 'Nord', 'Sud', 'Est', 'Ouest', 'Centre-Ville',
+]
+
+const GEN_STREETS = [
+  'boul. Taschereau', 'rue Principale', 'boul. Saint-Martin', 'ch. de Chambly',
+  'boul. des Sources', 'rue Notre-Dame', 'boul. Curé-Labelle', 'boul. de la Concorde',
+  'rue King Ouest', 'boul. Wilfrid-Hamel', 'av. du Parc', 'boul. Cartier',
+]
+
+function siteHash(i: number, salt: number): number {
+  const x = Math.sin(i * 131.7 + salt * 77.3) * 10000
+  return x - Math.floor(x)
+}
+
+function generateSites(): Site[] {
+  const out: Site[] = [...SEED_SITES]
+  const regimePool: Regime[] = ['7j', '6j', '6j', 'ferme_fin_de_semaine', 'ferme_fin_de_semaine', '5j_atm']
+  for (let i = out.length; i < 100; i++) {
+    const client = CLIENT_ORDER[Math.floor(siteHash(i, 1) * CLIENT_ORDER.length)]
+    const city = GEN_CITIES[Math.floor(siteHash(i, 2) * GEN_CITIES.length)]
+    const suffix = GEN_SUFFIX[Math.floor(siteHash(i, 3) * GEN_SUFFIX.length)]
+    const street = GEN_STREETS[Math.floor(siteHash(i, 8) * GEN_STREETS.length)]
+    const emp = EMPLOYEES[Math.floor(siteHash(i, 4) * EMPLOYEES.length)]
+    const regime = regimePool[Math.floor(siteHash(i, 5) * regimePool.length)]
+    const civic = 100 + Math.floor(siteHash(i, 6) * 8900)
+    const transit = String(1000 + Math.floor(siteHash(i, 9) * 8999))
+    const code = CODE_PREFIX[client] + String(100 + Math.floor(siteHash(i, 7) * 9899))
+    out.push({
+      id: `s-${i + 1}`,
+      client,
+      name: `${city} ${suffix}`,
+      address: `${civic} ${street}, ${city}`,
+      city,
+      clearsiteCode: code,
+      transit,
+      regime,
+      heureLimite: LIMITE_BY_CLIENT[client],
+      employeeId: emp.id,
+    })
+  }
+  return out
+}
+
+export const SITES: Site[] = generateSites()
+
 // ── Générateur déterministe ────────────────────────────────────────────────
 
 function hash(a: number, b: number): number {
   const x = Math.sin(a * 928.37 + b * 41.13) * 10000
   return x - Math.floor(x)
+}
+
+// Rang numérique d'un bâtiment (s-42 -> 42) : garantit un germe unique par ligne.
+function siteOrd(site: Site): number {
+  const n = Number.parseInt(site.id.slice(2), 10)
+  return Number.isFinite(n) ? n : 0
 }
 
 function weekday(day: number): number {
@@ -190,7 +298,7 @@ export type Cell = {
 const proofsById = new Map<string, Proof>()
 
 function buildProof(site: Site, day: number, status: 'recue' | 'anomalie', anomalies: AnomalyCode[]): Proof {
-  const seed = site.id.charCodeAt(2) * 100 + day
+  const seed = siteOrd(site) * 100 + day
   const id = `p-${site.id}-${day}`
   const emp = EMPLOYEES.find((e) => e.id === site.employeeId)!
   const distanceM = anomalies.includes('distance_elevee') ? 3700 : Math.floor(hash(seed, 3) * 120)
@@ -233,7 +341,7 @@ function buildGrid(): Cell[] {
   for (const site of SITES) {
     for (let day = 1; day <= DAYS_IN_MONTH; day++) {
       const wd = weekday(day)
-      const seed = site.id.charCodeAt(2) * 100 + day
+      const seed = siteOrd(site) * 100 + day
 
       if (HOLIDAYS[day]) {
         cells.push({ siteId: site.id, day, status: 'ferie' })
